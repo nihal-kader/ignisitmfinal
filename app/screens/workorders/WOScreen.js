@@ -193,12 +193,10 @@ function WOScreen(props) {
             width: 320,
           }}
         >
-          <NavigationContainer>
-            <Tab.Navigator>
-              <Tab.Screen name="Pending" component={Pending} />
-              <Tab.Screen name="Completed" component={Completed} />
-            </Tab.Navigator>
-          </NavigationContainer>
+          <Tab.Navigator>
+            <Tab.Screen name="Pending" component={Pending} />
+            <Tab.Screen name="Completed" component={Completed} />
+          </Tab.Navigator>
         </Surface>
 
         {selectedWo === 0 ? (
@@ -288,7 +286,27 @@ function WOScreen(props) {
                 >
                   Cancel
                 </Button>
-                <Button>
+                <Button
+                  onPress={() => {
+                    // setselectedWo(0);
+                    selectedWo.type === "Asset Tagging"
+                      ? props.navigation.navigate("AssetTagging", {
+                          screen: "ATHome",
+                          params: {
+                            WoID: selectedWo.wo_id,
+                            wo: selectedWo,
+                          },
+                        })
+                      : null;
+                    //   : props.navigation.navigate("ITM", {
+                    //       screen: "ITMHome",
+                    //       params: {
+                    //         WoID: selectedWo.wo_id,
+                    //         wo: selectedWo,
+                    //       },
+                    //     });
+                  }}
+                >
                   {selectedWo.status === "Pending" ? "Continue" : "View"}
                 </Button>
               </Card.Actions>

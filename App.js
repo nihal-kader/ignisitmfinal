@@ -8,8 +8,9 @@ import {
 import { SafeAreaView } from "react-native";
 import DashboardScreen from "./app/screens/dashboard";
 import LoginScreen from "./app/screens/Login";
-import WOScreen from "./app/screens/workorders/WOScreen";
 import AssetHome from "./app/screens/assettagging/AssetHome";
+import WorkOrder from "./app/screens/workorders";
+import { NavigationContainer } from "@react-navigation/native";
 
 const theme = {
   ...DefaultTheme,
@@ -58,7 +59,7 @@ const theme = {
 };
 const AlbumsRoute = () => <LoginScreen />;
 
-const RecentsRoute = () => <WOScreen />;
+const RecentsRoute = () => <WorkOrder />;
 
 const NotificationsRoute = () => <AssetHome />;
 
@@ -100,11 +101,15 @@ const App = () => {
 
   return (
     <Provider theme={theme}>
-      <BottomNavigation
-        navigationState={{ index, routes }}
-        onIndexChange={setIndex}
-        renderScene={renderScene}
-      />
+      <SafeAreaView style={{ flex: 1 }}>
+        <NavigationContainer>
+          <BottomNavigation
+            navigationState={{ index, routes }}
+            onIndexChange={setIndex}
+            renderScene={renderScene}
+          />
+        </NavigationContainer>
+      </SafeAreaView>
     </Provider>
   );
 };

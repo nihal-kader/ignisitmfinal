@@ -163,14 +163,13 @@ function DashboardScreen(props) {
             </View>
           </Surface>
 
-          <Surface
+          <View
             style={{
               padding: 10,
               borderRadius: 10,
               backgroundColor: "white",
               marginTop: 20,
-              width: "100%",
-              height: "100%",
+              flex: 1,
             }}
           >
             <View
@@ -203,7 +202,7 @@ function DashboardScreen(props) {
               events={schedule}
               height={600}
             />
-          </Surface>
+          </View>
         </View>
       )}
     </View>
