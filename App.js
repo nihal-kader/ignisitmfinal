@@ -11,6 +11,7 @@ import LoginScreen from "./app/screens/Login";
 import AssetHome from "./app/screens/assettagging/AssetHome";
 import WorkOrder from "./app/screens/workorders";
 import { NavigationContainer } from "@react-navigation/native";
+import AssetDetails from "./app/screens/assettagging/AssetDetails";
 
 const theme = {
   ...DefaultTheme,
@@ -61,7 +62,7 @@ const AlbumsRoute = () => <LoginScreen />;
 
 const RecentsRoute = () => <WorkOrder />;
 
-const NotificationsRoute = () => <AssetHome />;
+const NotificationsRoute = () => <AssetDetails />;
 
 const App = () => {
   const [index, setIndex] = React.useState(0);
