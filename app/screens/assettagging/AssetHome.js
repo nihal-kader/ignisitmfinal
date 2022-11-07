@@ -9,11 +9,19 @@ import {
   Text,
   Chip,
   TouchableRipple,
+  Portal,
+  Modal,
+  ActivityIndicator,
 } from "react-native-paper";
+import ViewAsset from "./ViewAsset";
 
 function AssetHome(props) {
   const [assetList, setAsset] = React.useState([]);
+  const [selectedAsset, setSelectedAsset] = React.useState({});
   const [loading, setLoading] = React.useState(false);
+  const [visible, setVisible] = React.useState(false);
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
   const { WoID, wo } = props.route.params;
   const getAssets = async () => {
     setLoading(true);
@@ -80,7 +88,9 @@ function AssetHome(props) {
             <Chip
               style={{ marginHorizontal: 10 }}
               icon="eye"
-              onPress={() => console.log("Pressed")}
+              onPress={() => {
+                showModal(), setSelectedAsset(item);
+              }}
             >
               View
             </Chip>
@@ -100,6 +110,11 @@ function AssetHome(props) {
         flex: 1,
       }}
     >
+      <Portal>
+        <Modal visible={visible} onDismiss={hideModal}>
+          <ViewAsset asset={selectedAsset} setVisible={setVisible} />
+        </Modal>
+      </Portal>
       <Surface
         style={{
           backgroundColor: "white",
@@ -159,11 +174,17 @@ function AssetHome(props) {
             height: "100%",
           }}
         >
-          <FlatList
-            data={assetList}
-            keyExtractor={(item) => item.asset_tag}
-            renderItem={({ item }) => <AseetListComponent item={item} />}
-          />
+          {loading === true ? (
+            <View style={{ justifyContent: "center", flex: 1 }}>
+              <ActivityIndicator size={"large"} />
+            </View>
+          ) : (
+            <FlatList
+              data={assetList}
+              keyExtractor={(item) => item.asset_tag}
+              renderItem={({ item }) => <AseetListComponent item={item} />}
+            />
+          )}
         </Surface>
         <FAB
           variant="surface"
@@ -175,7 +196,9 @@ function AssetHome(props) {
             position: "absolute",
             bottom: 0,
           }}
-          onPress={() => console.log("Pressed")}
+          onPress={() =>
+            props.navigation.navigate("DetailScreen", { WoID: WoID, wo: wo })
+          }
         />
       </View>
     </View>

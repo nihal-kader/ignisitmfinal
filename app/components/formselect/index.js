@@ -4,7 +4,14 @@ import { Controller } from "react-hook-form";
 import { HelperText, Text, TextInput } from "react-native-paper";
 import Select2 from "react-select2-native";
 
-const FormSelect = ({ control, name, rules = {}, label, data }) => {
+const FormSelect = ({
+  control,
+  name,
+  rules = {},
+  label,
+  data,
+  selectedValue,
+}) => {
   return (
     <Controller
       control={control}
@@ -22,12 +29,19 @@ const FormSelect = ({ control, name, rules = {}, label, data }) => {
             <Select2
               colorTheme={"black"}
               isSelectSingle
-              style={{ height: 50, borderRadius: 5 }}
+              style={{
+                backgroundColor: "rgb(250, 253, 253)",
+                borderColor: error && "red",
+                height: 50,
+                borderRadius: 5,
+              }}
               popupTitle={"Select " + label}
               title={"Select " + label}
               data={data}
               value={value}
-              onSelect={(data) => onChange(data[0])}
+              onSelect={(data) => {
+                onChange(data[0]), selectedValue(data);
+              }}
             />
 
             {error && (

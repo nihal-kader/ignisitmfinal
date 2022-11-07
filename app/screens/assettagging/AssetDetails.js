@@ -5,8 +5,19 @@ import { Avatar, Button, Card, Surface, Text, Title } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import FormInput from "../../components/forminput";
 import FormSelect from "../../components/formselect";
+import axios from "axios";
 
 function AssetDetails(props) {
+  const [devTypes, setDevTypes] = React.useState([]);
+  const [systems, setSystems] = React.useState([]);
+  const [selectsys, setselectSystems] = React.useState([]);
+  const [selectdev, setselectDev] = React.useState([]);
+  const selectedSValue = (value) => {
+    setselectSystems(value);
+  };
+  const selectedDValue = (value) => {
+    setselectDev(value);
+  };
   const [loading, setLoading] = React.useState(false);
   const {
     control,
@@ -18,11 +29,50 @@ function AssetDetails(props) {
 
     console.log(data);
   };
-  const mockData = [
-    { id: 1, name: "React Native Developer", checked: true }, // set default checked for render option item
-    { id: 4, name: "Android Developer" },
-    { id: 3, name: "iOS Developer" },
-  ];
+
+  const getDeviceData = async () => {
+    console.log(selectsys[0]);
+    await axios({
+      method: "get",
+      url: `https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/devices?id=${selectsys[0]}`,
+    })
+      .then((res) => {
+        // console.log(res.data.message);
+        setDevTypes(res.data.message);
+      })
+      .catch((err) => {
+        console.log(err.message);
+      });
+  };
+
+  const getSystemData = async () => {
+    await axios({
+      method: "get",
+      url: "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/systems",
+    })
+      .then((res) => {
+        // console.log(res.data.message);
+        setSystems(res.data.message);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  };
+
+  React.useEffect(() => {
+    (async () => {
+      getSystemData();
+    })();
+  }, []);
+
+  React.useEffect(() => {
+    (async () => {
+      if (selectsys.length != 0) {
+        getDeviceData(selectsys);
+      }
+    })();
+  }, [selectsys]);
+
   const [pickedImagePath, setPickedImagePath] = React.useState("");
   const [filePath, setFilePath] = React.useState({});
 
@@ -77,16 +127,18 @@ function AssetDetails(props) {
             control={control}
             name="system_id"
             rules={{ required: "System is required" }}
-            data={mockData}
+            data={systems}
             label="System"
+            selectedValue={selectedSValue}
           />
 
           <FormSelect
             control={control}
             name={"device_id"}
             rules={{ required: "Device is required" }}
-            data={mockData}
+            data={devTypes}
             label="Device"
+            selectedValue={selectedDValue}
           />
           <FormInput
             control={control}

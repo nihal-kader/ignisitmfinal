@@ -10,6 +10,7 @@ const FormInput = ({
   label,
   secureTextEntry,
   placeholder,
+  disabled,
 }) => {
   return (
     <Controller
@@ -37,6 +38,7 @@ const FormInput = ({
               onBlur={onBlur}
               placeholder={placeholder == null ? "Enter " + label : placeholder}
               secureTextEntry={secureTextEntry}
+              disabled={disabled}
             />
             {error && (
               <HelperText type="error">{error.message || "Error"}</HelperText>
