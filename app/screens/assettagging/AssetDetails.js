@@ -6,12 +6,22 @@ import * as ImagePicker from "expo-image-picker";
 import FormInput from "../../components/forminput";
 import FormSelect from "../../components/formselect";
 import axios from "axios";
+import { RNS3 } from "react-native-aws3";
 
 function AssetDetails(props) {
+  const { WoID, wo, editmode, asset } = props.route.params;
+  const [formData, setData] = React.useState({});
   const [devTypes, setDevTypes] = React.useState([]);
   const [systems, setSystems] = React.useState([]);
-  const [selectsys, setselectSystems] = React.useState([]);
-  const [selectdev, setselectDev] = React.useState([]);
+  const [selectsys, setselectSystems] =
+    editmode === true
+      ? React.useState({ id: asset.system_id, name: asset.system })
+      : React.useState({});
+  const [selectdev, setselectDev] =
+    editmode === true
+      ? React.useState({ id: asset.device_id, name: asset.device })
+      : React.useState({});
+
   const selectedSValue = (value) => {
     setselectSystems(value);
   };
@@ -23,18 +33,18 @@ function AssetDetails(props) {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm();
+  } = editmode === true ? useForm({ defaultValues: asset }) : useForm();
   const onSubmit = (data) => {
     setLoading(true);
-
+    setData(data, { system: selectsys.name, device: selectdev.name });
     console.log(data);
   };
 
   const getDeviceData = async () => {
-    console.log(selectsys[0]);
+    console.log(selectsys.id);
     await axios({
       method: "get",
-      url: `https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/devices?id=${selectsys[0]}`,
+      url: `https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/devices?id=${selectsys.id}`,
     })
       .then((res) => {
         // console.log(res.data.message);
@@ -59,6 +69,114 @@ function AssetDetails(props) {
       });
   };
 
+  const onFinish = async () => {
+    console.log(formData);
+
+    await axios({
+      method: "post",
+      url: "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/assets",
+      data: {
+        formData: formData,
+        otherData: {
+          image: imageLocation,
+          building_id: wo.building_id,
+          wo_id: wo.wo_id,
+        },
+      },
+    })
+      .then((res) => {
+        console.log(res.status);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  };
+
+  const generateTag = async () => {
+    let ID = 1;
+    setLoading(true);
+    await axios({
+      method: "get",
+      url: `https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/assets`,
+      params: { type: "AssetID" },
+    })
+      .then((res) => {
+        // console.log(res.data.message);
+        ID = parseInt(res.data.message.asset_id) + ID;
+        let tag = ID.toString();
+        tag = wo.building_id.toString() + tag;
+        tag = "AS".concat(tag);
+        setData({ ...formData, asset_tag: tag });
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err.message);
+        setLoading(false);
+      });
+  };
+
+  const uploadFile = () => {
+    setLoadingSubmit(true);
+    let dirName = formData.asset_tag;
+    dirName = dirName + "/";
+    let time = new Date().toJSON().slice(0, 16);
+    time = time.replace(":", "");
+    let filename = formData.asset_tag.concat("-", time);
+    console.log(dirName);
+    console.log(filename);
+
+    if (Object.keys(filePath).length == 0) {
+      alert("Please select image first");
+      return;
+    }
+    RNS3.put(
+      {
+        // `uri` can also be a file system path (i.e. file://)
+        uri: filePath.uri,
+        name: filename,
+        type: "image/jpeg",
+      },
+      {
+        keyPrefix: dirName, // Ex. myuploads/
+        bucket: "ignis-building-docs", // Ex. aboutreact
+        region: "us-east-1", // Ex. ap-south-1
+        accessKey: "AKIA22XEQOCAMOW65Y6R",
+        // Ex. AKIH73GS7S7C53M46OQ
+        secretKey: "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",
+        // Ex. Pt/2hdyro977ejd/h2u8n939nh89nfdnf8hd8f8fd
+        successActionStatus: 201,
+      }
+    )
+      .progress((progress) =>
+        setUploadSuccessMessage(
+          `Uploading: ${progress.loaded / progress.total} (${
+            progress.percent
+          }%)`
+        )
+      )
+      .then((response) => {
+        if (response.status !== 201) alert("Failed to upload image to S3");
+        console.log(response.body);
+        setFilePath("");
+        setImageLocation(response.body.postResponse.location);
+        setLoadingSubmit(false);
+
+        //Display asset tag QR code
+        setShowModal(true);
+
+        /**
+         * {
+         *   postResponse: {
+         *     bucket: "your-bucket",
+         *     etag : "9f620878e06d28774406017480a59fd4",
+         *     key: "uploads/image.png",
+         *     location: "https://bucket.s3.amazonaws.com/**.png"
+         *   }
+         * }
+         */
+      });
+  };
+
   React.useEffect(() => {
     (async () => {
       getSystemData();
@@ -73,7 +191,9 @@ function AssetDetails(props) {
     })();
   }, [selectsys]);
 
-  const [pickedImagePath, setPickedImagePath] = React.useState("");
+  const [pickedImagePath, setPickedImagePath] = React.useState(
+    editmode === true ? asset.image : ""
+  );
   const [filePath, setFilePath] = React.useState({});
 
   const showImagePicker = async () => {
@@ -121,7 +241,12 @@ function AssetDetails(props) {
   return (
     <View style={{ flexDirection: "row", flex: 1, padding: 10 }}>
       <View style={{ padding: 10, flex: 1, backgroundColor: "white" }}>
-        <Title>Asset Details</Title>
+        {editmode === true ? (
+          <Title>Edit Asset</Title>
+        ) : (
+          <Title>Asset Details</Title>
+        )}
+
         <ScrollView style={{ paddingTop: 10 }}>
           <FormSelect
             control={control}
@@ -130,6 +255,7 @@ function AssetDetails(props) {
             data={systems}
             label="System"
             selectedValue={selectedSValue}
+            title={editmode === true ? asset.system : "Select System"}
           />
 
           <FormSelect
@@ -139,6 +265,7 @@ function AssetDetails(props) {
             data={devTypes}
             label="Device"
             selectedValue={selectedDValue}
+            title={editmode === true ? asset.device : "Select Device"}
           />
           <FormInput
             control={control}
@@ -177,23 +304,34 @@ function AssetDetails(props) {
             rules={{ required: "Room No. is required" }}
             label="Room No."
           />
-          <View style={{ alignItems: "center", flexDirection: "row" }}>
-            <View style={{ flex: 3 / 2 }}>
-              <FormInput
-                control={control}
-                name="asset_tag"
-                rules={{ required: "Tag is required" }}
-                label="Asset Tag"
-                placeholder={"Enter Tag or Generate New"}
-              />
-            </View>
-            <View style={{ flex: 1, padding: 10 }}>
-              <Button style={{ marginTop: 20 }} mode="outlined">
-                Generate
-              </Button>
-            </View>
-          </View>
 
+          {editmode === true ? (
+            <FormInput
+              control={control}
+              name="asset_tag"
+              rules={{ required: "Tag is required" }}
+              label="Asset Tag"
+              placeholder={"Enter Tag or Generate New"}
+              disabled
+            />
+          ) : (
+            <View style={{ alignItems: "center", flexDirection: "row" }}>
+              <View style={{ flex: 3 / 2 }}>
+                <FormInput
+                  control={control}
+                  name="asset_tag"
+                  rules={{ required: "Tag is required" }}
+                  label="Asset Tag"
+                  placeholder={"Enter Tag or Generate New"}
+                />
+              </View>
+              <View style={{ flex: 1, padding: 10 }}>
+                <Button style={{ marginTop: 20 }} mode="outlined">
+                  Generate
+                </Button>
+              </View>
+            </View>
+          )}
           <Button
             loading={loading}
             onPress={handleSubmit(onSubmit)}

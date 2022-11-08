@@ -86,13 +86,26 @@ function AssetHome(props) {
             }}
           >
             <Chip
-              style={{ marginHorizontal: 10 }}
               icon="eye"
               onPress={() => {
                 showModal(), setSelectedAsset(item);
               }}
             >
               View
+            </Chip>
+            <Chip
+              icon="pencil"
+              style={{ marginHorizontal: 10 }}
+              onPress={() =>
+                props.navigation.navigate("DetailScreen", {
+                  asset: item,
+                  editmode: true,
+                  WoID: WoID,
+                  wo: wo,
+                })
+              }
+            >
+              Edit
             </Chip>
             <Chip icon="delete" onPress={() => console.log("Pressed")}>
               Delete
@@ -197,7 +210,11 @@ function AssetHome(props) {
             bottom: 0,
           }}
           onPress={() =>
-            props.navigation.navigate("DetailScreen", { WoID: WoID, wo: wo })
+            props.navigation.navigate("DetailScreen", {
+              editmode: false,
+              WoID: WoID,
+              wo: wo,
+            })
           }
         />
       </View>

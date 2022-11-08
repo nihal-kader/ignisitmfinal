@@ -11,6 +11,7 @@ const FormSelect = ({
   label,
   data,
   selectedValue,
+  title = "Select " + label,
 }) => {
   return (
     <Controller
@@ -36,11 +37,11 @@ const FormSelect = ({
                 borderRadius: 5,
               }}
               popupTitle={"Select " + label}
-              title={"Select " + label}
+              title={title}
               data={data}
               value={value}
-              onSelect={(data) => {
-                onChange(data[0]), selectedValue(data);
+              onSelect={(data, value) => {
+                onChange(data[0]), selectedValue(value[0]);
               }}
             />
 
