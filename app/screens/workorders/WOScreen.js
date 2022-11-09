@@ -297,14 +297,14 @@ function WOScreen(props) {
                             wo: selectedWo,
                           },
                         })
-                      : null;
-                    //   : props.navigation.navigate("ITM", {
-                    //       screen: "ITMHome",
-                    //       params: {
-                    //         WoID: selectedWo.wo_id,
-                    //         wo: selectedWo,
-                    //       },
-                    //     });
+                      // : null;
+                      : props.navigation.navigate("ITM", {
+                          screen: "ITMHome",
+                          params: {
+                            WoID: selectedWo.wo_id,
+                            wo: selectedWo,
+                          },
+                        });
                   }}
                 >
                   {selectedWo.status === "Pending" ? "Continue" : "View"}
