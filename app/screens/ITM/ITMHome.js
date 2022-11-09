@@ -79,7 +79,7 @@ function ITMHome(props) {
                     variant={"link"}
                     flex={1}
                     justifyContent={"flex-end"}
-                    // onPress={() => {props.navigation.navigate("ExecutionScreen", {asset: item})}}
+                    onPress={() => {props.navigation.navigate("ExecutionScreen", {asset: item})}}
                     >
                     Start
                     </Button>
