@@ -29,6 +29,7 @@ const FormSelect = ({
           >
             <Select2
               colorTheme={"black"}
+              selectedTitleStyle={{ color: "black" }}
               isSelectSingle
               style={{
                 backgroundColor: "rgb(250, 253, 253)",

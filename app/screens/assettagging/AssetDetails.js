@@ -1,18 +1,26 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { ScrollView, TextInput, View } from "react-native";
-import { Avatar, Button, Card, Surface, Text, Title } from "react-native-paper";
+import { Avatar, Button, Card, Modal, Portal, Title } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import FormInput from "../../components/forminput";
 import FormSelect from "../../components/formselect";
 import axios from "axios";
 import { RNS3 } from "react-native-aws3";
-
 function AssetDetails(props) {
   const { WoID, wo, editmode, asset } = props.route.params;
   const [formData, setData] = React.useState({});
   const [devTypes, setDevTypes] = React.useState([]);
   const [systems, setSystems] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+  const [gloading, setGLoading] = React.useState(false);
+  const [visible, setVisible] = React.useState(false);
+  const [filePath, setFilePath] = React.useState({});
+  const [uploadSuccessMessage, setUploadSuccessMessage] = React.useState("");
+  const [imageLocation, setImageLocation] = React.useState("");
+  const [pickedImagePath, setPickedImagePath] = React.useState(
+    editmode === true ? asset.image : ""
+  );
   const [selectsys, setselectSystems] =
     editmode === true
       ? React.useState({ id: asset.system_id, name: asset.system })
@@ -28,16 +36,17 @@ function AssetDetails(props) {
   const selectedDValue = (value) => {
     setselectDev(value);
   };
-  const [loading, setLoading] = React.useState(false);
+
   const {
     control,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = editmode === true ? useForm({ defaultValues: asset }) : useForm();
   const onSubmit = (data) => {
-    setLoading(true);
-    setData(data, { system: selectsys.name, device: selectdev.name });
-    console.log(data);
+    setData({ ...data, system: selectsys.name, device: selectdev.name });
+    console.log(formData);
+    uploadFile();
   };
 
   const getDeviceData = async () => {
@@ -94,29 +103,30 @@ function AssetDetails(props) {
 
   const generateTag = async () => {
     let ID = 1;
-    setLoading(true);
+    setGLoading(true);
     await axios({
       method: "get",
       url: `https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/assets`,
       params: { type: "AssetID" },
     })
       .then((res) => {
-        // console.log(res.data.message);
+        console.log(res.data.message);
         ID = parseInt(res.data.message.asset_id) + ID;
         let tag = ID.toString();
         tag = wo.building_id.toString() + tag;
         tag = "AS".concat(tag);
-        setData({ ...formData, asset_tag: tag });
-        setLoading(false);
+        console.log(tag);
+        setValue("asset_tag", tag);
+        setGLoading(false);
       })
       .catch((err) => {
         console.log(err.message);
-        setLoading(false);
+        setGLoading(false);
       });
   };
 
   const uploadFile = () => {
-    setLoadingSubmit(true);
+    setLoading(true);
     let dirName = formData.asset_tag;
     dirName = dirName + "/";
     let time = new Date().toJSON().slice(0, 16);
@@ -127,6 +137,7 @@ function AssetDetails(props) {
 
     if (Object.keys(filePath).length == 0) {
       alert("Please select image first");
+      setLoading(false);
       return;
     }
     RNS3.put(
@@ -159,21 +170,10 @@ function AssetDetails(props) {
         console.log(response.body);
         setFilePath("");
         setImageLocation(response.body.postResponse.location);
-        setLoadingSubmit(false);
+        setLoading(false);
 
         //Display asset tag QR code
-        setShowModal(true);
-
-        /**
-         * {
-         *   postResponse: {
-         *     bucket: "your-bucket",
-         *     etag : "9f620878e06d28774406017480a59fd4",
-         *     key: "uploads/image.png",
-         *     location: "https://bucket.s3.amazonaws.com/**.png"
-         *   }
-         * }
-         */
+        setVisible(true);
       });
   };
 
@@ -190,11 +190,6 @@ function AssetDetails(props) {
       }
     })();
   }, [selectsys]);
-
-  const [pickedImagePath, setPickedImagePath] = React.useState(
-    editmode === true ? asset.image : ""
-  );
-  const [filePath, setFilePath] = React.useState({});
 
   const showImagePicker = async () => {
     // Ask the user for the permission to access the media library
@@ -240,6 +235,11 @@ function AssetDetails(props) {
 
   return (
     <View style={{ flexDirection: "row", flex: 1, padding: 10 }}>
+      <Portal>
+        <Modal visible={visible} onDismiss={() => setVisible(false)}>
+          <Button onPress={() => console.log(formData)}>Set</Button>
+        </Modal>
+      </Portal>
       <View style={{ padding: 10, flex: 1, backgroundColor: "white" }}>
         {editmode === true ? (
           <Title>Edit Asset</Title>
@@ -270,7 +270,7 @@ function AssetDetails(props) {
           <FormInput
             control={control}
             name="mfr_name"
-            rules={{ required: "Username is required" }}
+            rules={{ required: true }}
             label="Manufacturer Name"
           />
           <FormInput
@@ -326,20 +326,41 @@ function AssetDetails(props) {
                 />
               </View>
               <View style={{ flex: 1, padding: 10 }}>
-                <Button style={{ marginTop: 20 }} mode="outlined">
+                <Button
+                  onPress={generateTag}
+                  style={{ marginTop: 20 }}
+                  mode="outlined"
+                  loading={gloading}
+                >
                   Generate
                 </Button>
               </View>
             </View>
           )}
-          <Button
-            loading={loading}
-            onPress={handleSubmit(onSubmit)}
-            style={{ marginVertical: 20 }}
-            mode="contained"
-          >
-            Submit
-          </Button>
+          {editmode === true ? (
+            <View>
+              <Button
+                loading={loading}
+                onPress={handleSubmit(onSubmit)}
+                style={{ marginVertical: 10 }}
+                mode="contained"
+              >
+                Save
+              </Button>
+              <Button mode="outlined" style={{ marginBottom: 20 }}>
+                Cancel
+              </Button>
+            </View>
+          ) : (
+            <Button
+              loading={loading}
+              onPress={handleSubmit(onSubmit)}
+              style={{ marginVertical: 20 }}
+              mode="contained"
+            >
+              Submit
+            </Button>
+          )}
         </ScrollView>
       </View>
 

@@ -41,7 +41,9 @@ const FormInput = ({
               disabled={disabled}
             />
             {error && (
-              <HelperText type="error">{error.message || "Error"}</HelperText>
+              <HelperText type="error">
+                {error.message || label + " is required"}
+              </HelperText>
             )}
           </View>
         </View>
