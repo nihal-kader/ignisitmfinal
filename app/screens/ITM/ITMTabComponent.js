@@ -2,7 +2,7 @@ import React from 'react';
 import { Image, View, StyleSheet, StatusBar, ScrollView } from 'react-native';
 import { Avatar, Button, SegmentedButtons, Switch, Text, TextInput, TouchableRipple } from 'react-native-paper';
 import * as ImagePicker from "expo-image-picker";
-// import { Audio } from "expo-av";
+import { Audio } from "expo-av";
 
 function ITMTabComponent(props) {
 
@@ -33,66 +33,66 @@ function ITMTabComponent(props) {
         }
     };
 
-    // //Voice Message
-    // //Audio recorder
-    // async function startRecording() {
-    //     try {
-    //     console.log("Requesting permissions..");
-    //     await Audio.requestPermissionsAsync();
-    //     await Audio.setAudioModeAsync({
-    //         allowsRecordingIOS: true,
-    //         playsInSilentModeIOS: true,
-    //     });
-    //     console.log("Starting recording..");
-    //     const { recording } = await Audio.Recording.createAsync(
-    //         Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
-    //     );
-    //     setRecording(recording);
-    //     console.log("Recording started");
-    //     } catch (err) {
-    //     console.error("Failed to start recording", err);
-    //     }
-    // }
+    //Voice Message
+    //Audio recorder
+    async function startRecording() {
+        try {
+        console.log("Requesting permissions..");
+        await Audio.requestPermissionsAsync();
+        await Audio.setAudioModeAsync({
+            allowsRecordingIOS: true,
+            playsInSilentModeIOS: true,
+        });
+        console.log("Starting recording..");
+        const { recording } = await Audio.Recording.createAsync(
+            Audio.RECORDING_OPTIONS_PRESET_HIGH_QUALITY
+        );
+        setRecording(recording);
+        console.log("Recording started");
+        } catch (err) {
+        console.error("Failed to start recording", err);
+        }
+    }
 
-    // async function stopRecording() {
-    //     console.log("Stopping recording..");
-    //     setRecording(undefined);
-    //     await recording.stopAndUnloadAsync();
-    //     const uri = recording.getURI();
-    //     setAudioPath(uri);
-    //     console.log("Recording stopped and stored at", uri);
-    // }
+    async function stopRecording() {
+        console.log("Stopping recording..");
+        setRecording(undefined);
+        await recording.stopAndUnloadAsync();
+        const uri = recording.getURI();
+        setAudioPath(uri);
+        console.log("Recording stopped and stored at", uri);
+    }
 
-    // //Playing audio
-    // const [sound, setSound] = React.useState();
+    //Playing audio
+    const [sound, setSound] = React.useState();
 
-    // async function playSound() {
-    //     try {
-    //     console.log("Loading Sound");
-    //     const { sound } = await Audio.Sound.createAsync(
-    //         // require('./assets/Hello.mp3')
-    //         { uri: audioPath }
-    //     );
-    //     setSound(sound);
+    async function playSound() {
+        try {
+        console.log("Loading Sound");
+        const { sound } = await Audio.Sound.createAsync(
+            // require('./assets/Hello.mp3')
+            { uri: audioPath }
+        );
+        setSound(sound);
 
-    //     console.log("Playing Sound");
-    //     await sound.playAsync();
-    //     // await sound.unloadAsync();
-    //     } catch (error) {
-    //     // An error occurred!
-    //     console.error("Failed to start playing", err);
-    //     }
-    // }
+        console.log("Playing Sound");
+        await sound.playAsync();
+        // await sound.unloadAsync();
+        } catch (error) {
+        // An error occurred!
+        console.error("Failed to start playing", err);
+        }
+    }
 
-    // React.useEffect(() => {
-    //     return sound
-    //     ? () => {
-    //         console.log("Unloading Sound");
-    //         sound.unloadAsync();
-    //         }
-    //     : undefined;
-    // }, [sound]);
-    // // Voice message -end
+    React.useEffect(() => {
+        return sound
+        ? () => {
+            console.log("Unloading Sound");
+            sound.unloadAsync();
+            }
+        : undefined;
+    }, [sound]);
+    // Voice message -end
 
     return (
         <View flex={1} style={{ backgroundColor: "white" }}>
@@ -117,7 +117,7 @@ function ITMTabComponent(props) {
                         textStyle={{ color: "#8a94a6" }}
                         containerStyle={{ borderRadius: 10, marginBottom: 20 }}
                         /> */}
-                        <Switch value={isSatisfactory} onValueChange={()=>{setIsSatisfactory(!isSatisfactory)}}/>
+                        <Switch color={"green"} value={isSatisfactory} onValueChange={()=>{setIsSatisfactory(!isSatisfactory)}}/>
                     </View>
                     <View flexDirection={"row"} space={1} alignItems={"center"}>
                         <Text style={styles.title}>Reading: </Text>
@@ -135,60 +135,66 @@ function ITMTabComponent(props) {
                         borderColor={"coolGray.300"}
                         rounded={10}
                         bgColor={"coolGray.100"}
+                        backgroundColor={"coolGray.100"}
                         height={100}
                     >
-                        <View flexDirection={"row"} justifyContent={"center"} alignItems={"center"}>
-                        <TextInput
+                        <View flexDirection={"row"} justifyContent={"center"} alignItems={"center"} flex={1}>
+                            <View flex={1} justifyContent={"flex-start"}>
+                                <TextInput
                             borderColor={"coolGray.100"}
-                            h={100}
+                            // h={100}
                             placeholder="Remarks"
-                            w="90%"
+                            // w="90%"
                             multiline={true}
+                            // numberOfLines={}
+                            backgroundColor={"white"}
                         />
+                        </View>
+                        
                         {/* <Icon size={40} name="microphone" type="material-community" color="grey" /> */}
-                        {/* <View>
-                            <TouchableOpacity
+                        <View>
+                            <TouchableRipple
                             onPress={recording ? stopRecording : startRecording}
                             >
                             {recording ? (
-                                <Icon
+                                <Avatar.Icon
                                 size={40}
-                                name="stop"
+                                icon="stop"
                                 type="material-community"
                                 color="grey"
                                 />
                             ) : (
-                                <Icon
+                                <Avatar.Icon
                                 size={40}
-                                name="microphone"
+                                icon="microphone"
                                 type="material-community"
                                 color="grey"
                                 />
                             )}
-                            </TouchableOpacity>
+                            </TouchableRipple>
                             {audioPath ? (
                             <View flexDirection={"row"} justifyContent={"center"}>
-                                <TouchableOpacity onPress={playSound}>
-                                <Icon
+                                <TouchableRipple onPress={playSound}>
+                                <Avatar.Icon
                                     size={40}
-                                    name="play"
+                                    icon="play"
                                     type="material-community"
                                     color="grey"
                                 />
-                                </TouchableOpacity>
-                                <TouchableOpacity
+                                </TouchableRipple>
+                                <TouchableRipple
                                 onPress={() => setAudioPath(undefined)}
                                 >
-                                <Icon
+                                <Avatar.Icon
                                     size={40}
-                                    name="close"
+                                    icon="close"
                                     type="material-community"
                                     color="grey"
                                 />
-                                </TouchableOpacity>
+                                </TouchableRipple>
                             </View>
                             ) : undefined}
-                        </View> */}
+                        </View>
                         </View>
                     </View>
                     </View>
