@@ -301,7 +301,6 @@ function WOScreen(props) {
                       : props.navigation.navigate("ITM", {
                           screen: "ITMHome",
                           params: {
-                            WoID: selectedWo.wo_id,
                             wo: selectedWo,
                           },
                         });
