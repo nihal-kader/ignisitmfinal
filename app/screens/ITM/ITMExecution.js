@@ -3,6 +3,7 @@ import { Image, View } from 'react-native';
 import { Text, Surface, Button, ActivityIndicator } from 'react-native-paper';
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import axios from "axios";
+import ITMTabComponent from './ITMTabComponent';
 
 function ITMExecution(props) {
 
@@ -34,9 +35,7 @@ function ITMExecution(props) {
 
     const Tab = createMaterialTopTabNavigator();
     const TabComponent = (assets) => (
-        <View padding={3} flex={1}>
-            <Text>{assets}</Text>
-        </View>
+        <ITMTabComponent/>
     );
     const Testing = () => {return TabComponent("Testing")};
     const Inspection = () => {return TabComponent("Inspection")};

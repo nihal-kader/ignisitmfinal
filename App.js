@@ -12,6 +12,7 @@ import AssetHome from "./app/screens/assettagging/AssetHome";
 import WorkOrder from "./app/screens/workorders";
 import { NavigationContainer } from "@react-navigation/native";
 import AssetDetails from "./app/screens/assettagging/AssetDetails";
+import ITMTabComponent from "./app/screens/ITM/ITMTabComponent";
 
 const theme = {
   ...DefaultTheme,
@@ -62,7 +63,7 @@ const AlbumsRoute = () => <LoginScreen />;
 
 const RecentsRoute = () => <WorkOrder />;
 
-const NotificationsRoute = () => <AssetDetails />;
+const NotificationsRoute = () => <ITMTabComponent />;
 
 const App = () => {
   const [index, setIndex] = React.useState(0);
