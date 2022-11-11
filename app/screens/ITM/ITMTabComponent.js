@@ -11,13 +11,14 @@ import {
   Text,
   TextInput,
   Title,
+  ToggleButton,
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import { Audio } from "expo-av";
 
 function ITMTabComponent(props) {
   const [selectedButton, setSelectedButton] = React.useState();
-  const [isSatisfactory, setIsSatisfactory] = React.useState(false);
+  const [isSatisfactory, setIsSatisfactory] = React.useState();
   const [pickedImagePath, setPickedImagePath] = React.useState("");
   const [recording, setRecording] = React.useState();
   const [audioPath, setAudioPath] = React.useState();
@@ -122,21 +123,25 @@ function ITMTabComponent(props) {
                   <Text style={styles.title}>Satisfactory: </Text>
                 </DataTable.Cell>
                 <DataTable.Cell>
-                  <Switch
-                    color={"green"}
+                  <ToggleButton.Row
+                    onValueChange={(value) => setIsSatisfactory(value)}
                     value={isSatisfactory}
-                    onValueChange={() => {
-                      setIsSatisfactory(!isSatisfactory);
-                    }}
-                  />
+                  >
+                    <ToggleButton icon="thumb-up" value={true} />
+                    <ToggleButton icon="thumb-down" value={false} />
+                  </ToggleButton.Row>
                 </DataTable.Cell>
               </DataTable.Row>
               <DataTable.Row>
                 <DataTable.Cell>
                   <Text style={styles.title}>Reading: </Text>
                 </DataTable.Cell>
-                <DataTable.Cell>
-                  <TextInput mode="outlined" placeholder="Input" />
+                <DataTable.Cell style={{ padding: 5 }}>
+                  <TextInput
+                    style={{ width: 150 }}
+                    mode="outlined"
+                    placeholder="Input"
+                  />
                 </DataTable.Cell>
               </DataTable.Row>
             </DataTable>
@@ -220,7 +225,7 @@ function ITMTabComponent(props) {
           ) : (
             <Card>
               <Card.Cover source={{ uri: pickedImagePath }} />
-              <Card.Actions>
+              <Card.Actions style={{ alignSelf: "center" }}>
                 <Button>Retake</Button>
               </Card.Actions>
             </Card>
