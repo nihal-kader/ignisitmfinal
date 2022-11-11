@@ -1,12 +1,22 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import { ScrollView, TextInput, View } from "react-native";
-import { Avatar, Button, Card, Modal, Portal, Title } from "react-native-paper";
+import {
+  Avatar,
+  Button,
+  Card,
+  Modal,
+  Portal,
+  Surface,
+  Text,
+  Title,
+} from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import FormInput from "../../components/forminput";
 import FormSelect from "../../components/formselect";
 import axios from "axios";
 import { RNS3 } from "react-native-aws3";
+import QRCode from "react-native-qrcode-svg";
 function AssetDetails(props) {
   const { WoID, wo, editmode, asset } = props.route.params;
   const [formData, setData] = React.useState({});
@@ -44,9 +54,7 @@ function AssetDetails(props) {
     formState: { errors },
   } = editmode === true ? useForm({ defaultValues: asset }) : useForm();
   const onSubmit = (data) => {
-    setData({ ...data, system: selectsys.name, device: selectdev.name });
-    console.log(formData);
-    uploadFile();
+    uploadFile(data);
   };
 
   const getDeviceData = async () => {
@@ -125,13 +133,14 @@ function AssetDetails(props) {
       });
   };
 
-  const uploadFile = () => {
+  const uploadFile = (data) => {
     setLoading(true);
-    let dirName = formData.asset_tag;
+    setData({ ...data, system: selectsys.name, device: selectdev.name });
+    let dirName = data.asset_tag;
     dirName = dirName + "/";
     let time = new Date().toJSON().slice(0, 16);
     time = time.replace(":", "");
-    let filename = formData.asset_tag.concat("-", time);
+    let filename = data.asset_tag.concat("-", time);
     console.log(dirName);
     console.log(filename);
 
@@ -172,7 +181,6 @@ function AssetDetails(props) {
         setImageLocation(response.body.postResponse.location);
         setLoading(false);
 
-        //Display asset tag QR code
         setVisible(true);
       });
   };
@@ -236,8 +244,45 @@ function AssetDetails(props) {
   return (
     <View style={{ flexDirection: "row", flex: 1, padding: 10 }}>
       <Portal>
-        <Modal visible={visible} onDismiss={() => setVisible(false)}>
-          <Button onPress={() => console.log(formData)}>Set</Button>
+        <Modal
+          style={{ alignItems: "center" }}
+          visible={visible}
+          dismissable={false}
+        >
+          <Surface
+            style={{
+              borderRadius: 10,
+              backgroundColor: "white",
+              padding: 30,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <QRCode
+              value={
+                formData.asset_tag == "" ? "NoTagGiven" : formData.asset_tag
+              }
+            />
+            <Text style={{ marginVertical: 10 }}>{formData.asset_tag}</Text>
+
+            <Button style={{ marginVertical: 5 }} mode="outlined">
+              Print Tag
+            </Button>
+            <Button
+              mode="contained"
+              onPress={() => {
+                onFinish();
+                setVisible(false);
+                props.navigation.navigate("ATHome", {
+                  WoID: WoID,
+                  wo: wo,
+                });
+              }}
+              style={{ marginVertical: 5 }}
+            >
+              Continue
+            </Button>
+          </Surface>
         </Modal>
       </Portal>
       <View style={{ padding: 10, flex: 1, backgroundColor: "white" }}>
@@ -347,7 +392,16 @@ function AssetDetails(props) {
               >
                 Save
               </Button>
-              <Button mode="outlined" style={{ marginBottom: 20 }}>
+              <Button
+                onPress={() => {
+                  props.navigation.navigate("ATHome", {
+                    WoID: WoID,
+                    wo: wo,
+                  });
+                }}
+                mode="outlined"
+                style={{ marginBottom: 20 }}
+              >
                 Cancel
               </Button>
             </View>

@@ -1,6 +1,6 @@
 import axios from "axios";
 import React from "react";
-import { FlatList, View } from "react-native";
+import { Alert, FlatList, View } from "react-native";
 import {
   Button,
   FAB,
@@ -37,6 +37,20 @@ function AssetHome(props) {
       .catch((err) => {
         console.log(err);
         setLoading(false);
+      });
+  };
+  const deleteAsset = async (id) => {
+    await axios({
+      method: "delete",
+      url: "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/assets",
+      data: { asset_id: id },
+    })
+      .then((res) => {
+        console.log(res.status);
+        getAssets();
+      })
+      .catch((err) => {
+        console.log(err.response.data);
       });
   };
 
@@ -81,35 +95,58 @@ function AssetHome(props) {
           <View
             style={{
               alignItems: "center",
-              flexDirection: "row",
+
               justifyContent: "center",
             }}
           >
-            <Chip
-              icon="eye"
-              onPress={() => {
-                showModal(), setSelectedAsset(item);
-              }}
-            >
-              View
-            </Chip>
-            <Chip
-              icon="pencil"
-              style={{ marginHorizontal: 10 }}
-              onPress={() =>
-                props.navigation.navigate("DetailScreen", {
-                  asset: item,
-                  editmode: true,
-                  WoID: WoID,
-                  wo: wo,
-                })
-              }
-            >
-              Edit
-            </Chip>
-            <Chip icon="delete" onPress={() => console.log("Pressed")}>
-              Delete
-            </Chip>
+            <View style={{ flexDirection: "row" }}>
+              <Chip
+                icon="eye"
+                onPress={() => {
+                  showModal(), setSelectedAsset(item);
+                }}
+              >
+                View
+              </Chip>
+              <Chip
+                icon="pencil"
+                style={{ marginHorizontal: 10 }}
+                onPress={() =>
+                  props.navigation.navigate("DetailScreen", {
+                    asset: item,
+                    editmode: true,
+                    WoID: WoID,
+                    wo: wo,
+                  })
+                }
+              >
+                Edit
+              </Chip>
+              <Chip
+                icon="delete"
+                onPress={() =>
+                  Alert.alert(
+                    "Delete Asset",
+                    "This will remove all data relating to " +
+                      item.asset_tag +
+                      ". This action cannot be reversed. Deleted data can not be recovered.",
+                    [
+                      {
+                        text: "Cancel",
+                        onPress: () => console.log("Cancel Pressed"),
+                        style: "cancel",
+                      },
+                      {
+                        text: "Delete",
+                        onPress: () => deleteAsset(item.asset_id),
+                      },
+                    ]
+                  )
+                }
+              >
+                Delete
+              </Chip>
+            </View>
           </View>
         </View>
       </TouchableRipple>
@@ -152,7 +189,7 @@ function AssetHome(props) {
             <Text variant="bodyLarge">{wo.building_name}</Text>
           </Text>
         </View>
-        <View style={{ flex: 1 }}>
+        <View style={{ minWidth: 70, flex: 1 }}>
           <Button style={{ marginVertical: 5 }} mode="outlined">
             Submit
           </Button>
@@ -190,6 +227,18 @@ function AssetHome(props) {
           {loading === true ? (
             <View style={{ justifyContent: "center", flex: 1 }}>
               <ActivityIndicator size={"large"} />
+            </View>
+          ) : assetList.length === 0 ? (
+            <View
+              style={{
+                alignItems: "center",
+                flex: 1,
+                justifyContent: "center",
+              }}
+            >
+              <Text>
+                No Assets to View! Click Add Asset to add a new Asset.
+              </Text>
             </View>
           ) : (
             <FlatList
