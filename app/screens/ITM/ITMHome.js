@@ -80,7 +80,6 @@ function ITMHome(props) {
           style={{
             flex: 2,
             justifyContent: "center",
-            alignItems: "center",
           }}
         >
           <View style={{ flexDirection: "row" }}>
