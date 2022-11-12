@@ -179,7 +179,7 @@ function ITMTabComponent({props, wo_id, asset_id, type, asset_tag}) {
             // setImageLocation(response.body.postResponse.location);
             // setLoadingSubmit(false);
             imagepath = response.body.postResponse.location;
-            setLoadingSubmit(false);
+            // setLoadingSubmit(false);
           });
 
         if (audioPath!==undefined) {
@@ -190,7 +190,7 @@ function ITMTabComponent({props, wo_id, asset_id, type, asset_tag}) {
                 console.log(response.body);
                 // console.log("Audio");
                 audiopath = response.body.postResponse.location
-                setLoadingSubmit(false);
+                // setLoadingSubmit(false);
             });
         }
 
@@ -226,6 +226,7 @@ function ITMTabComponent({props, wo_id, asset_id, type, asset_tag}) {
             .catch((err) => {
               console.log(err.response.data);
             });
+            setLoadingSubmit(false);
     }
   };
 
@@ -358,7 +359,9 @@ function ITMTabComponent({props, wo_id, asset_id, type, asset_tag}) {
             <Card>
               <Card.Cover source={{ uri: pickedImagePath }} />
               <Card.Actions style={{ alignSelf: "center" }}>
-                <Button>Retake</Button>
+                <Button onPress={() => {
+                    setPickedImagePath("");
+                  }}>Retake</Button>
               </Card.Actions>
             </Card>
           )}
