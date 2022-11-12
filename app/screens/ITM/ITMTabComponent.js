@@ -16,6 +16,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { Audio } from "expo-av";
 import { RNS3 } from "react-native-aws3";
+import axios from "axios";
 
 function ITMTabComponent({props, wo_id, asset_id, type, asset_tag}) {
   const [selectedButton, setSelectedButton] = React.useState();
@@ -197,17 +198,34 @@ function ITMTabComponent({props, wo_id, asset_id, type, asset_tag}) {
         console.log("audio:", audiopath);
 
         const data = {
-            wo_id: wo_id,
-            asset_id: asset_id,
-            type: type,
-            date: new Date(),
-            remarks: remarks,
-            remarks_audio: audioPath,
-            image: pickedImagePath,
-            satisfactory: isSatisfactory,
-            readings: reading,
-            status: "Completed",
+            // wo_id: wo_id,
+            // asset_id: asset_id,
+            // type: type,
+            "date_submit": new Date(),
+            "remarks": remarks,
+            "remarks_audio": audiopath,
+            "image": imagepath,
+            "satisfactory": isSatisfactory.toString(),
+            "readings": reading,
+            "status": 'Completed',
         }
+
+        await axios({
+            method: "put",
+            url: "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/itmworkorder",
+            data: {
+              data: data,
+              asset_id: asset_id,
+              wo_id: wo_id,
+              type: type
+            },
+          })
+            .then((res) => {
+              console.log(res.status);
+            })
+            .catch((err) => {
+              console.log(err.response.data);
+            });
     }
   };
 
