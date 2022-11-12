@@ -12,6 +12,7 @@ import {
 } from "react-native-paper";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import axios from "axios";
+import { useFocusEffect } from "@react-navigation/native";
 
 function ITMHome(props) {
   const theme = useTheme();
@@ -45,6 +46,13 @@ function ITMHome(props) {
     getAssets("Pending");
     getAssets("Completed");
   }, []);
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getAssets("Pending");
+      getAssets("Completed");
+    }, [])
+  );
 
   const ListItem = ({ item }) => {
     return (
