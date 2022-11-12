@@ -34,7 +34,7 @@ function WOScreen(props) {
     await axios
       .get(
         "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/workorders",
-        { params: { status: stat, user_id: 12 } }
+        { params: { status: stat, user_id: user.id } }
       )
       .then((res) => {
         if (stat == "Pending") {
