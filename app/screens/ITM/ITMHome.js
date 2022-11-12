@@ -54,7 +54,7 @@ function ITMHome(props) {
     }, [])
   );
 
-  const ListItem = ({ item }) => {
+  const ListItem = ({ item, status }) => {
     return (
       <View
         style={{
@@ -124,6 +124,7 @@ function ITMHome(props) {
           </View>
         </View>
         <View style={{ flex: 1 / 2, minWidth: 10, justifyContent: "center" }}>
+            {status==="Pending" && (
           <Button
             mode="outlined"
             onPress={() => {
@@ -131,14 +132,14 @@ function ITMHome(props) {
             }}
           >
             Start
-          </Button>
+          </Button>)}
         </View>
       </View>
     );
   };
 
   const Tab = createMaterialTopTabNavigator();
-  const TabComponent = (assets) => (
+  const TabComponent = (assets, status) => (
     <View padding={3} flex={1}>
       {isLoading ? (
         <View style={{ flex: 1, justifyContent: "center" }}>
@@ -147,7 +148,7 @@ function ITMHome(props) {
       ) : (
         <FlatList
           data={assets}
-          renderItem={({ item }) => <ListItem item={item} />}
+          renderItem={({ item }) => <ListItem item={item} status={status}/>}
           keyExtractor={(item) => item.Tag}
         />
       )}
@@ -155,10 +156,10 @@ function ITMHome(props) {
   );
 
   const Pending = () => {
-    return TabComponent(pendingAssets);
+    return TabComponent(pendingAssets, "Pending");
   };
   const Completed = () => {
-    return TabComponent(completedAssets);
+    return TabComponent(completedAssets, "Completed");
   };
 
   return (
