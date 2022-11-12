@@ -1,12 +1,18 @@
 import React from "react";
-import { Button, Card, DataTable, Text } from "react-native-paper";
+import {
+  ActivityIndicator,
+  Button,
+  Card,
+  DataTable,
+  Text,
+} from "react-native-paper";
 
 function ViewAsset({ asset, setVisible }) {
   return (
     <Card style={{ margin: 50 }}>
       <Card.Title title="View Asset" />
       <Card.Cover
-        loadingIndicatorSource={require("../../assets/loading.gif")}
+        loadingIndicatorSource={<ActivityIndicator />}
         resizeMode="contain"
         source={{ uri: asset.image }}
       />

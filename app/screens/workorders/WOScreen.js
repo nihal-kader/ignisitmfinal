@@ -297,8 +297,8 @@ function WOScreen(props) {
                             wo: selectedWo,
                           },
                         })
-                      // : null;
-                      : props.navigation.navigate("ITM", {
+                      : // : null;
+                        props.navigation.navigate("ITM", {
                           screen: "ITMHome",
                           params: {
                             wo: selectedWo,
