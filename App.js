@@ -5,7 +5,7 @@ import {
   Provider,
   Text,
 } from "react-native-paper";
-import { SafeAreaView } from "react-native";
+import { SafeAreaView, StatusBar } from "react-native";
 import DashboardScreen from "./app/screens/dashboard";
 import LoginScreen from "./app/screens/Login";
 import AssetHome from "./app/screens/assettagging/AssetHome";
@@ -13,6 +13,8 @@ import WorkOrder from "./app/screens/workorders";
 import { NavigationContainer } from "@react-navigation/native";
 import AssetDetails from "./app/screens/assettagging/AssetDetails";
 import ITMTabComponent from "./app/screens/ITM/ITMTabComponent";
+import ScheduleScreen from "./app/screens/schedule";
+import SettingsScreen from "./app/screens/settings";
 
 const theme = {
   ...DefaultTheme,
@@ -59,11 +61,8 @@ const theme = {
     backdrop: "rgba(41, 50, 52, 0.4)",
   },
 };
-const AlbumsRoute = () => <LoginScreen />;
 
-const RecentsRoute = () => <WorkOrder />;
-
-const NotificationsRoute = () => <ITMTabComponent />;
+const NotificationsRoute = () => <SettingsScreen />;
 
 const App = () => {
   const [index, setIndex] = React.useState(0);
@@ -81,10 +80,10 @@ const App = () => {
       unfocusedIcon: "briefcase-outline",
     },
     {
-      key: "requests",
-      title: "Requests",
-      focusedIcon: "inbox-arrow-up",
-      unfocusedIcon: "inbox-arrow-up-outline",
+      key: "schedule",
+      title: "Schedule",
+      focusedIcon: "calendar",
+      unfocusedIcon: "calendar-outline",
     },
     {
       key: "settings",
@@ -96,14 +95,15 @@ const App = () => {
 
   const renderScene = BottomNavigation.SceneMap({
     dashboard: () => <DashboardScreen />,
-    workorders: AlbumsRoute,
-    requests: RecentsRoute,
+    workorders: () => <WorkOrder />,
+    schedule: () => <ScheduleScreen />,
     settings: NotificationsRoute,
   });
 
   return (
     <Provider theme={theme}>
       <SafeAreaView style={{ flex: 1 }}>
+        <StatusBar />
         <NavigationContainer>
           <BottomNavigation
             navigationState={{ index, routes }}

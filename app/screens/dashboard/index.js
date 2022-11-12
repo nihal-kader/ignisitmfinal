@@ -92,7 +92,7 @@ function DashboardScreen(props) {
         </View>
       ) : (
         <View style={{ padding: 10, flex: 1 }}>
-          <Text>Welcome !</Text>
+          <Text>Welcome {user.name}!</Text>
           <Surface
             style={{
               borderRadius: 10,

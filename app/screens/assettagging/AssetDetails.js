@@ -85,6 +85,26 @@ function AssetDetails(props) {
         console.log(err);
       });
   };
+  const onSave = async () => {
+    console.log(formData);
+    setLoading(true);
+    await axios({
+      method: "put",
+      url: "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/assets",
+      data: {
+        formData: formData,
+        asset_id: asset.asset_id,
+      },
+    })
+      .then((res) => {
+        console.log(res.status);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+        setLoading(false);
+      });
+  };
 
   const onFinish = async () => {
     console.log(formData);
@@ -271,7 +291,7 @@ function AssetDetails(props) {
             <Button
               mode="contained"
               onPress={() => {
-                onFinish();
+                editmode === true ? onSave() : onFinish();
                 setVisible(false);
                 props.navigation.navigate("ATHome", {
                   WoID: WoID,
