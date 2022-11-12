@@ -27,7 +27,7 @@ function LoginScreen(props) {
           const user = res.data.message.user;
           const token = res.data.message.token;
           await setUserSession({ user, token });
-
+          props.navigation.navigate("Tab");
           // if (user.first_login) {
           // 	navigate("/resetpassword");
           // } else {

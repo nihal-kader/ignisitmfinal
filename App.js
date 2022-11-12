@@ -15,6 +15,7 @@ import AssetDetails from "./app/screens/assettagging/AssetDetails";
 import ITMTabComponent from "./app/screens/ITM/ITMTabComponent";
 import ScheduleScreen from "./app/screens/schedule";
 import SettingsScreen from "./app/screens/settings";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 const theme = {
   ...DefaultTheme,
@@ -62,9 +63,8 @@ const theme = {
   },
 };
 
-const NotificationsRoute = () => <SettingsScreen />;
-
 const App = () => {
+  const MainNav = createNativeStackNavigator();
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     {
@@ -97,19 +97,36 @@ const App = () => {
     dashboard: () => <DashboardScreen />,
     workorders: () => <WorkOrder />,
     schedule: () => <ScheduleScreen />,
-    settings: NotificationsRoute,
+    settings: () => <SettingsScreen />,
   });
+
+  const Tab = () => {
+    return (
+      <BottomNavigation
+        navigationState={{ index, routes }}
+        onIndexChange={setIndex}
+        renderScene={renderScene}
+      />
+    );
+  };
 
   return (
     <Provider theme={theme}>
       <SafeAreaView style={{ flex: 1 }}>
         <StatusBar />
         <NavigationContainer>
-          <BottomNavigation
-            navigationState={{ index, routes }}
-            onIndexChange={setIndex}
-            renderScene={renderScene}
-          />
+          <MainNav.Navigator>
+            <MainNav.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ headerShown: false }}
+            />
+            <MainNav.Screen
+              name="Tab"
+              component={Tab}
+              options={{ headerShown: false }}
+            />
+          </MainNav.Navigator>
         </NavigationContainer>
       </SafeAreaView>
     </Provider>
