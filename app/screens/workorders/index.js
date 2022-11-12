@@ -12,7 +12,7 @@ function WorkOrder() {
       <WONav.Screen
         name="WOHome"
         component={WOScreen}
-        options={{ title: "Work Orders", headerShown: false }}
+        options={{ title: "Work Orders", headerShown: false, gestureEnabled: false }}
       />
       <WONav.Screen
         name="AssetTagging"
