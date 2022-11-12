@@ -15,13 +15,20 @@ import {
 } from "react-native-paper";
 import * as ImagePicker from "expo-image-picker";
 import { Audio } from "expo-av";
+import { RNS3 } from "react-native-aws3";
 
-function ITMTabComponent(props) {
+function ITMTabComponent({props, wo_id, asset_id, type, asset_tag}) {
   const [selectedButton, setSelectedButton] = React.useState();
   const [isSatisfactory, setIsSatisfactory] = React.useState();
   const [pickedImagePath, setPickedImagePath] = React.useState("");
   const [recording, setRecording] = React.useState();
   const [audioPath, setAudioPath] = React.useState();
+  const [remarks, setRemarks] = React.useState("");
+  const [reading, setReading] = React.useState("");
+
+  const [imageLocation, setImageLocation] = React.useState("");
+  const [isLoadingSubmit, setLoadingSubmit] = React.useState(false);
+
 
   //Open Camera
   const openCamera = async () => {
@@ -104,6 +111,107 @@ function ITMTabComponent(props) {
   }, [sound]);
   // Voice message -end
 
+
+  const uploadFile = async (filePath, fileType) => {
+    setLoadingSubmit(true);
+    let dirName = asset_tag;
+    dirName = dirName + "/" + fileType + "/" + type + "/";
+    let time = new Date().toJSON().slice(0, 16);
+    time = time.replace(":", "");
+    let filename = asset_tag.concat("-", time);
+
+    const filetype = filePath.split(".").pop();
+    fileType = fileType + "/" + filetype;
+    filename = filename + "." + filetype;
+    console.log(dirName);
+    console.log(filename);
+    console.log(fileType);
+
+    // if (Object.keys(filePath).length == 0) {
+    if (filePath.length == 0) {
+      alert("Please select file first");
+      return;
+    }
+    return await RNS3.put(
+      {
+        // `uri` can also be a file system path (i.e. file://)
+        uri: filePath,
+        name: filename,
+        type: fileType,//"image/jpeg"
+      },
+      {
+        keyPrefix: dirName, // Ex. myuploads/
+        bucket: "ignis-building-docs", // Ex. aboutreact
+        region: "us-east-1", // Ex. ap-south-1
+        accessKey: "AKIA22XEQOCAMOW65Y6R",
+        // Ex. AKIH73GS7S7C53M46OQ
+        secretKey: "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",
+        // Ex. Pt/2hdyro977ejd/h2u8n939nh89nfdnf8hd8f8fd
+        successActionStatus: 201,
+      }
+    )
+    //   .then((response) => {
+    //     if (response.status !== 201) alert("Failed to upload image to S3");
+    //     console.log(response.body);
+    //     // setFilePath("");
+    //     setImageLocation(response.body.postResponse.location);
+    //     setLoadingSubmit(false);
+
+    //   });
+  };
+
+  const onSubmit = async () => {
+    
+    let imagepath = ""
+    let audiopath = ""
+    if ((isSatisfactory===undefined) && (type==="I" || type==="T")) {
+        alert("Please select satisfactory or not!")
+    } else if ((pickedImagePath==="") && (type==="I" || type==="M")){
+        alert("Please take an image of the asset!")
+    } else {
+        console.log(data);
+        await uploadFile(pickedImagePath,"image")
+        .then((response) => {
+            if (response.status !== 201) alert("Failed to upload image to S3");
+            console.log(response.body);
+            // setFilePath("");
+            // setImageLocation(response.body.postResponse.location);
+            // setLoadingSubmit(false);
+            imagepath = response.body.postResponse.location;
+            setLoadingSubmit(false);
+          });
+
+        if (audioPath!==undefined) {
+            console.log("In Audio upload")
+            await uploadFile(audioPath, "audio")
+            .then((response) => {
+                if (response.status !== 201) alert("Failed to upload audio to S3");
+                console.log(response.body);
+                // console.log("Audio");
+                audiopath = response.body.postResponse.location
+                setLoadingSubmit(false);
+            });
+        }
+
+        console.log("image:", imagepath);
+        console.log("audio:", audiopath);
+
+        const data = {
+            wo_id: wo_id,
+            asset_id: asset_id,
+            type: type,
+            date: new Date(),
+            remarks: remarks,
+            remarks_audio: audioPath,
+            image: pickedImagePath,
+            satisfactory: isSatisfactory,
+            readings: reading,
+            status: "Completed",
+        }
+    }
+  };
+
+
   return (
     <View style={{ flex: 1, backgroundColor: "white" }}>
       <View style={{ flexDirection: "row", flex: 1 }}>
@@ -132,20 +240,24 @@ function ITMTabComponent(props) {
                   </ToggleButton.Row>
                 </DataTable.Cell>
               </DataTable.Row>
-              <DataTable.Row>
-                <DataTable.Cell>
-                  <Text style={styles.title}>Reading: </Text>
-                </DataTable.Cell>
-                <DataTable.Cell style={{ padding: 5 }}>
-                  <TextInput
-                    style={{ width: 150 }}
-                    mode="outlined"
-                    placeholder="Input"
-                  />
-                </DataTable.Cell>
-              </DataTable.Row>
+          
             </DataTable>
-
+            <View
+              style={{
+                marginLeft: 15,
+                alignItems: "center",
+                flexDirection: "row",
+              }}
+            >
+              <Text style={styles.title}>Reading: </Text>
+              <TextInput
+                style={{ marginLeft: 100, width: 150 }}
+                mode="outlined"
+                placeholder="Input"
+                value={reading}
+                onChangeText={value => setReading(value)}
+              />
+            </View>
             <View
               style={{
                 margin: 10,
@@ -166,6 +278,8 @@ function ITMTabComponent(props) {
                   mode="outlined"
                   placeholder="Remarks"
                   multiline={true}
+                  value={remarks}
+                  onChangeText={value => setRemarks(value)}
                 />
               </View>
 
@@ -205,7 +319,7 @@ function ITMTabComponent(props) {
                 ) : undefined}
               </View>
             </View>
-            <Button mode="contained">Submit</Button>
+            <Button mode="contained" loading={isLoadingSubmit} onPress={() => {onSubmit()}}>Submit</Button>
           </ScrollView>
         </View>
         <View style={{ margin: 10, flex: 1 }}>

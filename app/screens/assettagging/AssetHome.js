@@ -13,6 +13,7 @@ import {
   Modal,
   ActivityIndicator,
 } from "react-native-paper";
+import { useFocusEffect } from "@react-navigation/native";
 import ViewAsset from "./ViewAsset";
 
 function AssetHome(props) {
@@ -152,6 +153,13 @@ function AssetHome(props) {
       </TouchableRipple>
     );
   };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      getAssets();
+    }, [])
+  );
+
   return (
     <View
       style={{

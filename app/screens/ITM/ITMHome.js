@@ -119,7 +119,7 @@ function ITMHome(props) {
           <Button
             mode="outlined"
             onPress={() => {
-              props.navigation.navigate("ExecutionScreen", { asset: item });
+              props.navigation.navigate("ExecutionScreen", { asset: item, wo_id: wo.wo_id });
             }}
           >
             Start

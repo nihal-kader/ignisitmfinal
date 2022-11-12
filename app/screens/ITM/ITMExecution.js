@@ -12,7 +12,7 @@ import axios from "axios";
 import ITMTabComponent from "./ITMTabComponent";
 
 function ITMExecution(props) {
-  const { asset } = props.route.params;
+  const { asset, wo_id } = props.route.params;
   const [imagepath, setImagePath] = React.useState("");
   const [isLoading, setLoading] = React.useState(false);
 
@@ -39,15 +39,15 @@ function ITMExecution(props) {
   }, []);
 
   const Tab = createMaterialTopTabNavigator();
-  const TabComponent = (assets) => <ITMTabComponent />;
+  const TabComponent = (type) => <ITMTabComponent asset_id={asset.asset_id} wo_id={wo_id} type={type} asset_tag={asset.asset_tag}/>;
   const Testing = () => {
-    return TabComponent("Testing");
+    return TabComponent("T");
   };
   const Inspection = () => {
-    return TabComponent("Inspection");
+    return TabComponent("I");
   };
   const Maintenance = () => {
-    return TabComponent("Maintenance");
+    return TabComponent("M");
   };
 
   return (
@@ -75,7 +75,7 @@ function ITMExecution(props) {
           marginVertical: 10,
           padding: 10,
           flexDirection: "row",
-          flex: 1,
+
         }}
       >
         <View style={{ justifyContent: "center", marginHorizontal: 10 }}>
