@@ -18,7 +18,7 @@ import axios from "axios";
 import { RNS3 } from "react-native-aws3";
 import QRCode from "react-native-qrcode-svg";
 function AssetDetails(props) {
-  const { WoID, wo, editmode, asset } = props.route.params;
+  const { WoID, wo, editmode, asset, task_id } = props.route.params;
   const [formData, setData] = React.useState({});
   const [devTypes, setDevTypes] = React.useState([]);
   const [systems, setSystems] = React.useState([]);
@@ -296,6 +296,7 @@ function AssetDetails(props) {
                 props.navigation.navigate("ATHome", {
                   WoID: WoID,
                   wo: wo,
+                  task_id: task_id,
                 });
               }}
               style={{ marginVertical: 5 }}
@@ -422,6 +423,7 @@ function AssetDetails(props) {
                   props.navigation.navigate("ATHome", {
                     WoID: WoID,
                     wo: wo,
+                    task_id: task_id,
                   });
                 }}
                 mode="outlined"

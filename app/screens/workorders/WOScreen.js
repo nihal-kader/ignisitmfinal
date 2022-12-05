@@ -72,8 +72,8 @@ function WOScreen(props) {
           onPress={() => {
             setselectedWo(item);
           }}
-          title={item.type}
-          description={item.full_id}
+          title={"WO: " + item.wo_id}
+          description={item.building_name}
           style={{
             backgroundColor:
               item === selectedWo ? "rgba(0, 0, 0, .05)" : "white",

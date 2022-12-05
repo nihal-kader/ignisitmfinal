@@ -16,7 +16,8 @@ import { createMaterialTopTabNavigator } from "@react-navigation/material-top-ta
 
 
 function WODetails(props) {
-  const [taskList, setTasks] = React.useState([]);
+  const [pendingTaskList, setPendingTasks] = React.useState([]);
+  const [completedTaskList, setCompletedTasks] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const { wo } = props.route.params;
   const getTasks = async () => {
@@ -27,7 +28,8 @@ function WODetails(props) {
     })
       .then((res) => {
         console.log(res.data.message);
-        setTasks(res.data.message);
+        setPendingTasks(res.data.message.filter(item => item.status === 'pending'))
+        setCompletedTasks(res.data.message.filter(item => item.status === 'completed'))
         setLoading(false);
       })
       .catch((err) => {
@@ -100,6 +102,7 @@ function WODetails(props) {
             }}
           >
             <View style={{ flexDirection: "row" }}>
+                {item.status === 'pending' && (
               <Chip
                 icon="play"
                 style={{ marginHorizontal: 10 }}
@@ -117,6 +120,7 @@ function WODetails(props) {
                                     screen: "ATHome",
                                     params: {
                                       wo: wo,
+                                      task_id: item.id,
                                     },
                                   })
                     } else {
@@ -130,7 +134,7 @@ function WODetails(props) {
                 }}
               >
                 Start
-              </Chip>
+              </Chip>)}
             </View>
           </View>
         </View>
@@ -140,7 +144,7 @@ function WODetails(props) {
 
   const Tab = createMaterialTopTabNavigator();
 
-  const PendingTabComponent = () => {
+  const TabComponent = (tasks) => {
     return(
         <View
         style={{
@@ -159,7 +163,7 @@ function WODetails(props) {
             <View style={{ justifyContent: "center", flex: 1 }}>
               <ActivityIndicator size={"large"} />
             </View>
-          ) : taskList.length === 0 ? (
+          ) : tasks.length === 0 ? (
             <View
               style={{
                 alignItems: "center",
@@ -173,7 +177,7 @@ function WODetails(props) {
             </View>
           ) : (
             <FlatList
-              data={taskList}
+              data={tasks}
               keyExtractor={(item) => item.asset_tag}
               renderItem={({ item }) => <ListComponent item={item} />}
             />
@@ -245,8 +249,10 @@ function WODetails(props) {
         </View>
       </View>
       <Tab.Navigator>
-        <Tab.Screen name="Pending" component={PendingTabComponent} />
-        <Tab.Screen name="Completed" component={PendingTabComponent} />
+        {/* <Tab.Screen name="Pending" component={() => PendingTabComponent(pendingTaskList)} /> */}
+        <Tab.Screen name="Pending">{() => TabComponent(pendingTaskList)}</Tab.Screen>
+        {/* <Tab.Screen name="Completed" component={() => PendingTabComponent(completedTaskList)} /> */}
+        <Tab.Screen name="Completed">{() => TabComponent(completedTaskList)}</Tab.Screen>
       </Tab.Navigator>
     </View>
   );

@@ -23,12 +23,12 @@ function AssetHome(props) {
   const [visible, setVisible] = React.useState(false);
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
-  const { WoID, wo } = props.route.params;
+  const { WoID, wo, task_id } = props.route.params;
   const getAssets = async () => {
     setLoading(true);
     await axios({
       method: "get",
-      url: `https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/assets?id=${WoID}`,
+      url: `https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/assets?id=${wo.wo_id}`,
     })
       .then((res) => {
         console.log(res.data.message);
@@ -55,12 +55,28 @@ function AssetHome(props) {
       });
   };
 
+  // const submit = async () => {
+  //   await axios({
+  //     method: "put",
+  //     url: "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/workorders",
+  //     data: {
+  //       wo_id: wo.wo_id
+  //     },
+  //   })
+  //     .then((res) => {
+  //       console.log(res.status);
+  //     })
+  //     .catch((err) => {
+  //       console.log(err.response.data);
+  //     });
+  // }
+
   const submit = async () => {
     await axios({
       method: "put",
-      url: "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/workorders",
+      url: "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/tasks",
       data: {
-        wo_id: wo.wo_id
+        task_id: task_id
       },
     })
       .then((res) => {
@@ -134,6 +150,7 @@ function AssetHome(props) {
                     editmode: true,
                     WoID: WoID,
                     wo: wo,
+                    task_id: task_id,
                   })
                 }
               >
@@ -202,7 +219,7 @@ function AssetHome(props) {
           <Text variant="titleLarge">Work Order</Text>
           <Text>
             <Text variant="titleMedium">WO#: </Text>
-            <Text variant="bodyLarge">{WoID}</Text>
+            <Text variant="bodyLarge">{wo.wo_id}</Text>
           </Text>
           <Text>
             <Text variant="titleMedium">Type: </Text>
@@ -214,7 +231,8 @@ function AssetHome(props) {
           </Text>
         </View>
         <View style={{ minWidth: 70, flex: 1 }}>
-          <Button style={{ marginVertical: 5 }} mode="outlined" onPress={() => {submit()}}>
+          <Button style={{ marginVertical: 5 }} mode="outlined" onPress={() => {submit();
+          props.navigation.navigate("WODetails", {wo: wo})}}>
             Submit
           </Button>
           {/* <Button style={{ marginVertical: 5 }} mode="contained" onPress={() => {props.navigation.navigate("WOHome")}}> */}
