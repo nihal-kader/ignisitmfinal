@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import WOScreen from "./WOScreen";
 import AssetTagging from "../assettagging";
 import ITM from "../ITM";
+import WODetails from "./WODetails";
 
 const WONav = createNativeStackNavigator();
 
@@ -13,6 +14,11 @@ function WorkOrder() {
         name="WOHome"
         component={WOScreen}
         options={{ title: "Work Orders", headerShown: false, gestureEnabled: false }}
+      />
+      <WONav.Screen
+        name="WODetails"
+        component={WODetails}
+        options={{ title: "Work Order", headerBackVisible: false, gestureEnabled: false }}
       />
       <WONav.Screen
         name="AssetTagging"

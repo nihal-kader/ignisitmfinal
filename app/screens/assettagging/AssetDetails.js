@@ -356,7 +356,12 @@ function AssetDetails(props) {
             rules={{ required: "Drawing No. is required" }}
             label="Drawing No."
           />
-
+     <FormInput
+            control={control}
+            name="unit_no"
+            rules={{ required:"Unit No. is required"  }}
+            label="Unit No."
+          />
           <FormInput
             control={control}
             name="floor_no"

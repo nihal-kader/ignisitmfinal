@@ -55,6 +55,22 @@ function AssetHome(props) {
       });
   };
 
+  const submit = async () => {
+    await axios({
+      method: "put",
+      url: "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/workorders",
+      data: {
+        wo_id: wo.wo_id
+      },
+    })
+      .then((res) => {
+        console.log(res.status);
+      })
+      .catch((err) => {
+        console.log(err.response.data);
+      });
+  }
+
   React.useEffect(() => {
     (async () => {
       getAssets();
@@ -198,10 +214,11 @@ function AssetHome(props) {
           </Text>
         </View>
         <View style={{ minWidth: 70, flex: 1 }}>
-          <Button style={{ marginVertical: 5 }} mode="outlined">
+          <Button style={{ marginVertical: 5 }} mode="outlined" onPress={() => {submit()}}>
             Submit
           </Button>
-          <Button style={{ marginVertical: 5 }} mode="contained">
+          {/* <Button style={{ marginVertical: 5 }} mode="contained" onPress={() => {props.navigation.navigate("WOHome")}}> */}
+          <Button style={{ marginVertical: 5 }} mode="contained" onPress={() => {props.navigation.navigate("WODetails", {wo: wo})}}>
             Save & Exit
           </Button>
         </View>

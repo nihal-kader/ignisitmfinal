@@ -29,8 +29,10 @@ function WOScreen(props) {
   const [searchQuery, setSearchQuery] = React.useState("");
 
   const getWO = async (stat) => {
+    let user = await getUser();
+    setUser(user);
     setLoading(true);
-    // console.log(user.id);
+    console.log(user.id);
     await axios
       .get(
         "https://bjiwogsbrc.execute-api.us-east-1.amazonaws.com/Prod/workorders",
@@ -49,10 +51,10 @@ function WOScreen(props) {
       });
   };
 
+
+
   React.useEffect(() => {
     (async () => {
-      let user = await getUser();
-      setUser(user);
       getWO("Completed");
       getWO("Pending");
     })();
@@ -287,24 +289,25 @@ function WOScreen(props) {
                   Cancel
                 </Button>
                 <Button
-                  onPress={() => {
-                    // setselectedWo(0);
-                    selectedWo.type === "Asset Tagging"
-                      ? props.navigation.navigate("AssetTagging", {
-                          screen: "ATHome",
-                          params: {
-                            WoID: selectedWo.wo_id,
-                            wo: selectedWo,
-                          },
-                        })
-                      : // : null;
-                        props.navigation.navigate("ITM", {
-                          screen: "ITMHome",
-                          params: {
-                            wo: selectedWo,
-                          },
-                        });
-                  }}
+                  // onPress={() => {
+                  //   // setselectedWo(0);
+                  //   selectedWo.type === "Asset Tagging"
+                  //     ? props.navigation.navigate("AssetTagging", {
+                  //         screen: "ATHome",
+                  //         params: {
+                  //           WoID: selectedWo.wo_id,
+                  //           wo: selectedWo,
+                  //         },
+                  //       })
+                  //     : // : null;
+                  //       props.navigation.navigate("ITM", {
+                  //         screen: "ITMHome",
+                  //         params: {
+                  //           wo: selectedWo,
+                  //         },
+                  //       });
+                  // }}
+                  onPress={() => {props.navigation.navigate("WODetails", {wo: selectedWo})}}
                 >
                   {selectedWo.status === "Pending" ? "Continue" : "View"}
                 </Button>

@@ -8,14 +8,15 @@ import {
 import { SafeAreaView, StatusBar } from "react-native";
 import DashboardScreen from "./app/screens/dashboard";
 import LoginScreen from "./app/screens/Login";
-import AssetHome from "./app/screens/assettagging/AssetHome";
+import Ionicons from "react-native-vector-icons/Ionicons";
+
 import WorkOrder from "./app/screens/workorders";
 import { NavigationContainer } from "@react-navigation/native";
-import AssetDetails from "./app/screens/assettagging/AssetDetails";
-import ITMTabComponent from "./app/screens/ITM/ITMTabComponent";
+
 import ScheduleScreen from "./app/screens/schedule";
 import SettingsScreen from "./app/screens/settings";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 const theme = {
   ...DefaultTheme,
@@ -65,50 +66,46 @@ const theme = {
 
 const App = () => {
   const MainNav = createNativeStackNavigator();
-  const [index, setIndex] = React.useState(0);
-  const [routes] = React.useState([
-    {
-      key: "dashboard",
-      title: "Dashboard",
-      focusedIcon: "view-dashboard",
-      unfocusedIcon: "view-dashboard-outline",
-    },
-    {
-      key: "workorders",
-      title: "Work Orders",
-      focusedIcon: "briefcase",
-      unfocusedIcon: "briefcase-outline",
-    },
-    {
-      key: "schedule",
-      title: "Schedule",
-      focusedIcon: "calendar",
-      unfocusedIcon: "calendar-outline",
-    },
-    {
-      key: "settings",
-      title: "Settings",
-      focusedIcon: "cog",
-      unfocusedIcon: "cog-outline",
-    },
-  ]);
 
-  const renderScene = BottomNavigation.SceneMap({
-    dashboard: () => <DashboardScreen />,
-    workorders: () => <WorkOrder />,
-    schedule: () => <ScheduleScreen />,
-    settings: () => <SettingsScreen />,
-  });
+  const Tab = createBottomTabNavigator();
 
-  const Tab = () => {
+  function MyTab() {
     return (
-      <BottomNavigation
-        navigationState={{ index, routes }}
-        onIndexChange={setIndex}
-        renderScene={renderScene}
-      />
+      <Tab.Navigator
+        id="MyTab"
+        screenOptions={({ route }) => ({
+          headerShown: false,
+
+          tabBarIcon: ({ focused, color, size }) => {
+            let iconName;
+
+            if (route.name === "Dashboard") {
+              iconName = focused ? "grid" : "grid-outline";
+            } else if (route.name === "Work Orders") {
+              iconName = focused ? "briefcase" : "briefcase-outline";
+            } else if (route.name === "Schedule") {
+              iconName = focused ? "calendar" : "calendar-outline";
+            } else if (route.name === "Requests") {
+              iconName = focused ? "mail-open" : "mail-open-outline";
+            } else if (route.name === "Settings") {
+              iconName = focused ? "settings" : "settings-outline";
+            }
+
+            // You can return any component that you like here!
+            return <Ionicons name={iconName} size={size} color={color} />;
+          },
+          tabBarActiveTintColor: "tomato",
+          tabBarInactiveTintColor: "gray",
+        })}
+      >
+        <Tab.Screen name="Dashboard" component={DashboardScreen} />
+        <Tab.Screen name="Work Orders" component={WorkOrder} />
+        <Tab.Screen name="Schedule" component={ScheduleScreen} />
+        {/* <Tab.Screen name="Requests" component={Requests} /> */}
+        <Tab.Screen name="Settings" component={SettingsScreen} />
+      </Tab.Navigator>
     );
-  };
+  }
 
   return (
     <Provider theme={theme}>
@@ -123,7 +120,7 @@ const App = () => {
             />
             <MainNav.Screen
               name="Tab"
-              component={Tab}
+              component={MyTab}
               options={{ headerShown: false }}
             />
           </MainNav.Navigator>
