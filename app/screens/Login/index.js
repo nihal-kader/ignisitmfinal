@@ -61,6 +61,7 @@ function LoginScreen(props) {
         />
         <Card.Content
           style={{
+            backgroundColor: "white",
             flex: 1,
           }}
         >

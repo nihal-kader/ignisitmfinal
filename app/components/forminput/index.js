@@ -21,7 +21,12 @@ const FormInput = ({
         field: { value, onChange, onBlur },
         fieldState: { error },
       }) => (
-        <View style={{ marginVertical: 5, flexDirection: "column" }}>
+        <View
+          style={{
+            marginVertical: 5,
+            flexDirection: "column",
+          }}
+        >
           <Text>{label}</Text>
           <View
             style={[
